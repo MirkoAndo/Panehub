@@ -250,7 +250,6 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                   {product.sale_method === 'weight' ? 'Aggiungi 100 g alla volta · prezzo calcolato al kg' : 'Aggiungi all’ordine'}
                 </p>
               </div> 
-              Aggiungi
           </article>
         ))}
       </div>
@@ -286,8 +285,8 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
         </p>
       </div>
       <div className="grid gap-3 text-sm text-[#c9b8a6]">
-        <p className="flex items-center gap-2"><MapPin size={16} /> Via del Grano 12, Catania</p>
-        <p className="flex items-center gap-2"><Phone size={16} /> +39 02 555 0148</p>
+        <p className="flex items-center gap-2"><MapPin size={16} /> Via Antonio Pacinotti 69, Catania</p>
+        <p className="flex items-center gap-2"><Phone size={16} /> +39 123 456 7890</p>
         <p className="flex items-center gap-2"><Star size={16} /> @fornopanevero</p>
       </div>
     </div>
