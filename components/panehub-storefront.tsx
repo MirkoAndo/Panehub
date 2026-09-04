@@ -210,10 +210,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
             </div>
             
             {/* PULSANTE AGGIUNGI */}
-            <button 
-              onClick={() => updateCart(product.id, 1)} 
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d9cdbd] py-2.5 text-sm font-semibold text-[#5b4b41] transition hover:border-[#ad4e32] hover:bg-[#ad4e32] hover:text-[#fffaf3]"
-            >
+
               <div className="mt-4 rounded-xl border border-[#d9cdbd] bg-[#fffaf3] p-2">
                 
                 <div className="mb-2 flex items-center justify-between text-xs text-[#76675c]">
@@ -239,6 +236,14 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                       style={{ width: `${Math.min(100, ((cart[product.id] ?? 0) / (product.sale_method === 'weight' ? 1000 : 5)) * 100)}%` }} 
                     />
                   </div>
+                  <button 
+                    type="button" 
+                    aria-label={`Aggiungi ${product.name}`} 
+                    onClick={() => updateCart(product.id, 1)} 
+                    className="grid size-9 place-items-center rounded-lg bg-[#30251f] text-[#fffaf3] transition hover:bg-[#ad4e32]"
+                  >
+                    <Plus size={16} />
+                  </button>
                 </div>
                 
                 <p className="mt-2 text-[11px] text-[#76675c]">
@@ -246,7 +251,6 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                 </p>
               </div> 
               Aggiungi
-            </button>
           </article>
         ))}
       </div>
