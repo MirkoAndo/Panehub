@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 import { ArrowRight, CalendarDays, Check, ChevronDown, Clock3, MapPin, Phone, Plus, ShoppingBag, Sparkles, Star } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 
 type Product = { id: string; name: string; description: string; price: number; unit: string; category_id: string | null }
 type Category = { id: string; name: string; slug: string }
@@ -78,13 +77,10 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
   const submitReservation = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!form.name || !form.phone || !form.date || cartItems.length === 0) return
-    const code = `PV-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
-    const supabase = createClient()
-    const { data, error } = await supabase.from('reservations').insert({ reservation_code: code, customer_name: form.name, customer_phone: form.phone, customer_email: form.email || null, pickup_date: form.date, pickup_time_slot: form.slot, notes: form.notes || null, total }).select('id').single()
-    if (!error && data) {
-      await supabase.from('reservation_items').insert(cartItems.map((item) => ({ reservation_id: data.id, product_id: item.id.startsWith('pane-') || item.id.startsWith('focaccia-') ? item.id : null, product_name: item.name, quantity: item.quantity, unit_price: item.price, subtotal: Number(item.price) * item.quantity })))
-    }
-    setSubmittedCode(code)
+    const response = await fetch('/api/reservations', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email || null, date: form.date, slot: form.slot, notes: form.notes || null, items: cartItems.map((item) => ({ productId: item.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? item.id : null, productName: item.name, quantity: item.quantity, unitPrice: Number(item.price) })) }) })
+    const result = await response.json()
+    if (!response.ok) { window.alert(result.error ?? 'Impossibile inoltrare la prenotazione.'); return }
+    setSubmittedCode(result.code)
     setCart({})
   }
   return (
