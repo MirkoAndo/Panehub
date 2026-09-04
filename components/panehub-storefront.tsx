@@ -105,12 +105,15 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
       <a href="#contatti" className="hover:text-[#ad4e32]">Contatti</a>
     </nav>
     
-    <button 
-      onClick={() => setShowReservation(true)} 
-      className="flex items-center gap-2 rounded-full bg-[#30251f] px-4 py-2.5 text-sm font-semibold text-[#f7f1e8] transition hover:bg-[#ad4e32]"
-    >
-      <ShoppingBag size={16} /> Prenota ritiro
-    </button>
+    <div className="flex items-center gap-3">
+      <a href="/dashboard" className="hidden rounded-full border border-[#d9cdbd] px-4 py-2.5 text-sm font-semibold text-[#5b4b41] transition hover:border-[#ad4e32] hover:text-[#ad4e32] sm:inline-flex">Riservato al personale</a>
+      <button 
+        onClick={() => setShowReservation(true)} 
+        className="flex items-center gap-2 rounded-full bg-[#30251f] px-4 py-2.5 text-sm font-semibold text-[#f7f1e8] transition hover:bg-[#ad4e32]"
+      >
+        <ShoppingBag size={16} /> Prenota ritiro
+      </button>
+    </div>
   </header>
 
   {/* SEZIONE HERO (TOP) */}
@@ -209,8 +212,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
               </p>
             </div>
             
-            {/* PULSANTE AGGIUNGI */}
-
+            {/* Aggiunta quantità */}
               <div className="mt-4 rounded-xl border border-[#d9cdbd] bg-[#fffaf3] p-2">
                 
                 <div className="mb-2 flex items-center justify-between text-xs text-[#76675c]">
@@ -250,6 +252,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                   {product.sale_method === 'weight' ? 'Aggiungi 100 g alla volta · prezzo calcolato al kg' : 'Aggiungi all’ordine'}
                 </p>
               </div> 
+
           </article>
         ))}
       </div>
