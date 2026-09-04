@@ -2,19 +2,68 @@
 
 import { useMemo, useState } from 'react'
 import { ArrowRight, CalendarDays, Check, ChevronDown, Clock3, MapPin, Phone, Plus, ShoppingBag, Sparkles, Star } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
-type Product = { id: string; name: string; description: string; price: number; unit: string; sale_method?: 'piece' | 'weight'; price_per_kg?: number | null; category_id: string | null }
+type Product = { id: string; name: string; description: string; price: number; unit: string; category_id: string | null }
 type Category = { id: string; name: string; slug: string }
 
 const fallbackProducts: Product[] = [
-  { id: 'pane-1', name: 'Pane Casereccio', description: 'Crosta croccante, mollica morbida e profumo di forno.', price: 3.5, unit: 'pezzo', category_id: 'pane' },
-  { id: 'pane-2', name: 'Ciabatta', description: 'Leggera e alveolata, perfetta per ogni tavola.', price: 1.2, unit: 'pezzo', category_id: 'pane' },
-  { id: 'focaccia-1', name: 'Focaccia Classica', description: 'Alta, soffice e finita con olio extravergine.', price: 4.5, unit: 'teglia', category_id: 'focacce' },
-  { id: 'pane-3', name: 'Pane Integrale', description: 'Farina integrale macinata a pietra e semi tostati.', price: 3.8, unit: 'pezzo', category_id: 'pane' },
-  { id: 'dolce-1', name: 'Cornetto', description: 'Sfogliato al burro, disponibile semplice o farcito.', price: 1.5, unit: 'pezzo', category_id: 'dolci' },
-  { id: 'biscotti-1', name: 'Biscotti Artigianali', description: 'Piccola frolla dorata, fatta con burro e mandorle.', price: 5, unit: 'sacchetto', category_id: 'biscotteria' },
-]
-const fallbackCategories: Category[] = [{ id: 'pane', name: 'Pane', slug: 'pane' }, { id: 'focacce', name: 'Focacce', slug: 'focacce' }, { id: 'dolci', name: 'Dolci', slug: 'dolci' }, { id: 'biscotteria', name: 'Biscotteria', slug: 'biscotteria' }]
+  {
+    id: 'pane-1',
+    name: 'Pane Casereccio',
+    description: 'Crosta croccante, mollica morbida e profumo di forno.',
+    price: 3.5,
+    unit: 'pezzo',
+    category_id: 'pane',
+  },
+  {
+    id: 'pane-2',
+    name: 'Ciabatta',
+    description: 'Leggera e alveolata, perfetta per ogni tavola.',
+    price: 1.2,
+    unit: 'pezzo',
+    category_id: 'pane',
+  },
+  {
+    id: 'focaccia-1',
+    name: 'Focaccia Classica',
+    description: 'Alta, soffice e finita con olio extravergine.',
+    price: 4.5,
+    unit: 'teglia',
+    category_id: 'focacce',
+  },
+  {
+    id: 'pane-3',
+    name: 'Pane Integrale',
+    description: 'Farina integrale macinata a pietra e semi tostati.',
+    price: 3.8,
+    unit: 'pezzo',
+    category_id: 'pane',
+  },
+  {
+    id: 'dolce-1',
+    name: 'Cornetto',
+    description: 'Sfogliato al burro, disponibile semplice o farcito.',
+    price: 1.5,
+    unit: 'pezzo',
+    category_id: 'dolci',
+  },
+  {
+    id: 'biscotti-1',
+    name: 'Biscotti Artigianali',
+    description: 'Piccola frolla dorata, fatta con burro e mandorle.',
+    price: 5,
+    unit: 'sacchetto',
+    category_id: 'biscotteria',
+  },
+];
+
+const fallbackCategories: Category[] = [
+  { id: 'pane',        name: 'Pane',        slug: 'pane' },
+  { id: 'focacce',     name: 'Focacce',     slug: 'focacce' },
+  { id: 'dolci',       name: 'Dolci',       slug: 'dolci' },
+  { id: 'biscotteria', name: 'Biscotteria', slug: 'biscotteria' },
+];
 
 export function PanehubStorefront({ products = fallbackProducts, categories = fallbackCategories }: { products?: Product[]; categories?: Category[] }) {
   const [activeCategory, setActiveCategory] = useState('all')
@@ -24,19 +73,22 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
   const [form, setForm] = useState({ name: '', phone: '', email: '', date: '', slot: '07:00 – 09:00', notes: '' })
   const visible = activeCategory === 'all' ? products : products.filter((product) => product.category_id === activeCategory || product.category_id === categories.find((category) => category.slug === activeCategory)?.id)
   const cartItems = products.filter((product) => cart[product.id]).map((product) => ({ ...product, quantity: cart[product.id] }))
-  const total = useMemo(() => cartItems.reduce((sum, item) => sum + (item.sale_method === 'weight' ? Number(item.price_per_kg ?? item.price) * item.quantity / 1000 : Number(item.price) * item.quantity), 0), [cartItems])
-  const updateCart = (id: string, delta: number) => setCart((current) => { const product = products.find((item) => item.id === id); const step = product?.sale_method === 'weight' ? 100 : 1; return { ...current, [id]: Math.max(0, (current[id] ?? 0) + delta * step) } })
+  const total = useMemo(() => cartItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0), [cartItems])
+  const updateCart = (id: string, delta: number) => setCart((current) => ({ ...current, [id]: Math.max(0, (current[id] ?? 0) + delta) }))
   const submitReservation = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!form.name || !form.phone || !form.date || cartItems.length === 0) return
-    const response = await fetch('/api/reservations', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email || null, date: form.date, slot: form.slot, notes: form.notes || null, items: cartItems.map((item) => ({ productId: item.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? item.id : null, productName: item.name, quantity: item.quantity, unitPrice: item.sale_method === 'weight' ? Number(item.price_per_kg ?? item.price) : Number(item.price), saleMethod: item.sale_method ?? 'piece' })) }) })
-    const result = await response.json()
-    if (!response.ok) { window.alert(result.error ?? 'Impossibile inviare la prenotazione.'); return }
-    setSubmittedCode(result.code)
+    const code = `PV-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+    const supabase = createClient()
+    const { data, error } = await supabase.from('reservations').insert({ reservation_code: code, customer_name: form.name, customer_phone: form.phone, customer_email: form.email || null, pickup_date: form.date, pickup_time_slot: form.slot, notes: form.notes || null, total }).select('id').single()
+    if (!error && data) {
+      await supabase.from('reservation_items').insert(cartItems.map((item) => ({ reservation_id: data.id, product_id: item.id.startsWith('pane-') || item.id.startsWith('focaccia-') ? item.id : null, product_name: item.name, quantity: item.quantity, unit_price: item.price, subtotal: Number(item.price) * item.quantity })))
+    }
+    setSubmittedCode(code)
     setCart({})
   }
   return (
-<main className="min-h-screen bg-[#f7f1e8] text-[#30251f]">
+  <main className="min-h-screen bg-[#f7f1e8] text-[#30251f]">
   
   {/* HEADER */}
   <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
@@ -160,11 +212,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
               </p>
             </div>
             
-            {/* PULSANTE AGGIUNGI */}
-            <button 
-              onClick={() => updateCart(product.id, 1)} 
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d9cdbd] py-2.5 text-sm font-semibold text-[#5b4b41] transition hover:border-[#ad4e32] hover:bg-[#ad4e32] hover:text-[#fffaf3]"
-            >
+            {/* Aggiunta quantità */}
               <div className="mt-4 rounded-xl border border-[#d9cdbd] bg-[#fffaf3] p-2">
                 
                 <div className="mb-2 flex items-center justify-between text-xs text-[#76675c]">
@@ -204,8 +252,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                   {product.sale_method === 'weight' ? 'Aggiungi 100 g alla volta · prezzo calcolato al kg' : 'Aggiungi all’ordine'}
                 </p>
               </div> 
-              Aggiungi
-            </button>
+
           </article>
         ))}
       </div>
