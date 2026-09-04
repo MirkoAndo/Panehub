@@ -8,14 +8,62 @@ type Product = { id: string; name: string; description: string; price: number; u
 type Category = { id: string; name: string; slug: string }
 
 const fallbackProducts: Product[] = [
-  { id: 'pane-1', name: 'Pane Casereccio', description: 'Crosta croccante, mollica morbida e profumo di forno.', price: 3.5, unit: 'pezzo', category_id: 'pane' },
-  { id: 'pane-2', name: 'Ciabatta', description: 'Leggera e alveolata, perfetta per ogni tavola.', price: 1.2, unit: 'pezzo', category_id: 'pane' },
-  { id: 'focaccia-1', name: 'Focaccia Classica', description: 'Alta, soffice e finita con olio extravergine.', price: 4.5, unit: 'teglia', category_id: 'focacce' },
-  { id: 'pane-3', name: 'Pane Integrale', description: 'Farina integrale macinata a pietra e semi tostati.', price: 3.8, unit: 'pezzo', category_id: 'pane' },
-  { id: 'dolce-1', name: 'Cornetto', description: 'Sfogliato al burro, disponibile semplice o farcito.', price: 1.5, unit: 'pezzo', category_id: 'dolci' },
-  { id: 'biscotti-1', name: 'Biscotti Artigianali', description: 'Piccola frolla dorata, fatta con burro e mandorle.', price: 5, unit: 'sacchetto', category_id: 'biscotteria' },
-]
-const fallbackCategories: Category[] = [{ id: 'pane', name: 'Pane', slug: 'pane' }, { id: 'focacce', name: 'Focacce', slug: 'focacce' }, { id: 'dolci', name: 'Dolci', slug: 'dolci' }, { id: 'biscotteria', name: 'Biscotteria', slug: 'biscotteria' }]
+  {
+    id: 'pane-1',
+    name: 'Pane Casereccio',
+    description: 'Crosta croccante, mollica morbida e profumo di forno.',
+    price: 3.5,
+    unit: 'pezzo',
+    category_id: 'pane',
+  },
+  {
+    id: 'pane-2',
+    name: 'Ciabatta',
+    description: 'Leggera e alveolata, perfetta per ogni tavola.',
+    price: 1.2,
+    unit: 'pezzo',
+    category_id: 'pane',
+  },
+  {
+    id: 'focaccia-1',
+    name: 'Focaccia Classica',
+    description: 'Alta, soffice e finita con olio extravergine.',
+    price: 4.5,
+    unit: 'teglia',
+    category_id: 'focacce',
+  },
+  {
+    id: 'pane-3',
+    name: 'Pane Integrale',
+    description: 'Farina integrale macinata a pietra e semi tostati.',
+    price: 3.8,
+    unit: 'pezzo',
+    category_id: 'pane',
+  },
+  {
+    id: 'dolce-1',
+    name: 'Cornetto',
+    description: 'Sfogliato al burro, disponibile semplice o farcito.',
+    price: 1.5,
+    unit: 'pezzo',
+    category_id: 'dolci',
+  },
+  {
+    id: 'biscotti-1',
+    name: 'Biscotti Artigianali',
+    description: 'Piccola frolla dorata, fatta con burro e mandorle.',
+    price: 5,
+    unit: 'sacchetto',
+    category_id: 'biscotteria',
+  },
+];
+
+const fallbackCategories: Category[] = [
+  { id: 'pane',        name: 'Pane',        slug: 'pane' },
+  { id: 'focacce',     name: 'Focacce',     slug: 'focacce' },
+  { id: 'dolci',       name: 'Dolci',       slug: 'dolci' },
+  { id: 'biscotteria', name: 'Biscotteria', slug: 'biscotteria' },
+];
 
 export function PanehubStorefront({ products = fallbackProducts, categories = fallbackCategories }: { products?: Product[]; categories?: Category[] }) {
   const [activeCategory, setActiveCategory] = useState('all')
@@ -191,14 +239,6 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                       style={{ width: `${Math.min(100, ((cart[product.id] ?? 0) / (product.sale_method === 'weight' ? 1000 : 5)) * 100)}%` }} 
                     />
                   </div>
-                  <button 
-                    type="button" 
-                    aria-label={`Aggiungi ${product.name}`} 
-                    onClick={() => updateCart(product.id, 1)} 
-                    className="grid size-9 place-items-center rounded-lg bg-[#30251f] text-[#fffaf3] transition hover:bg-[#ad4e32]"
-                  >
-                    <Plus size={16} />
-                  </button>
                 </div>
                 
                 <p className="mt-2 text-[11px] text-[#76675c]">
