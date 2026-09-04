@@ -15,8 +15,9 @@ export async function POST(request: Request) {
   if (error || !data || !valid(password, data.password_hash)) return NextResponse.json({ error: 'Password non valida' }, { status: 401 })
   const token = crypto.createHmac('sha256', process.env.SUPABASE_JWT_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY!).update(data.password_hash).digest('hex')
   const response = NextResponse.json({ ok: true })
-  response.cookies.set(cookieName, token, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12 })
-  response.cookies.set('panehub_dashboard_verified', '1', { httpOnly: false, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12 })
+  const secure = process.env.NODE_ENV === 'production'
+  response.cookies.set(cookieName, token, { httpOnly: true, secure, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12 })
+  response.cookies.set('panehub_dashboard_verified', '1', { httpOnly: false, secure, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12 })
   return response
 }
 
