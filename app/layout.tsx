@@ -7,7 +7,7 @@ const display = Cormorant_Garamond({ subsets: ['latin'], variable: '--font-displ
 const body = DM_Sans({ subsets: ['latin'], variable: '--font-body', weight: ['400', '500', '600', '700'] })
 
 export const metadata: Metadata = {
-  title: 'Forno Panevero | Pane artigianale a Milano',
+  title: 'Forno Panevero | Pane artigianale a Catania',
   description: 'Pane, focacce e dolci artigianali. Prenota il tuo ritiro al Forno Panevero.',
   generator: 'PaneHub',
 }
