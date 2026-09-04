@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import crypto from 'node:crypto'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 
-const getAdmin = () => createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+const getAdmin = () => createAdminClient()
 const cookieName = 'panehub_dashboard'
 const digest = (password: string, salt: string) => crypto.scryptSync(password, salt, 64).toString('hex')
 const valid = (password: string, stored: string) => { const [salt, hash] = stored.split(':'); return !!salt && !!hash && crypto.timingSafeEqual(Buffer.from(digest(password, salt), 'hex'), Buffer.from(hash, 'hex')) }
