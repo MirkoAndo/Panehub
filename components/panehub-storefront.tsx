@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { ArrowRight, CalendarDays, Check, ChevronDown, Clock3, MapPin, Phone, Plus, ShoppingBag, Sparkles, Star } from 'lucide-react'
 
-type Product = { id: string; name: string; description: string; price: number; unit: string; category_id: string | null }
+type Product = { id: string; name: string; description: string; price: number; unit: string; sale_method?: 'piece' | 'weight' | 'both'; price_per_kg?: number | null; image_url?: string | null; category_id: string | null }
 type Category = { id: string; name: string; slug: string }
 
 const fallbackProducts: Product[] = [
@@ -188,10 +188,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
             className="group rounded-2xl border border-[#e5d9ca] bg-[#f7f1e8] p-3 transition hover:-translate-y-1 hover:shadow-xl"
           >
             <div className={`relative flex aspect-[1.2] items-end overflow-hidden rounded-xl p-5 ${index % 3 === 0 ? 'bg-[#d9a977]' : index % 3 === 1 ? 'bg-[#e8d0b0]' : 'bg-[#c78156]'}`}>
-              <div 
-                className="absolute inset-0 opacity-50" 
-                style={{ backgroundImage: 'radial-gradient(ellipse at 50% 70%, #8f4b2e 0 19%, transparent 20%), radial-gradient(ellipse at 38% 57%, #f2d4a9 0 11%, transparent 12%), radial-gradient(ellipse at 65% 42%, #f2d4a9 0 13%, transparent 14%)' }} 
-              />
+  {product.image_url ? <img src={product.image_url} alt={product.name} className="absolute inset-0 size-full object-cover" /> : <div className="absolute inset-0 opacity-50" style={{ backgroundImage: 'radial-gradient(ellipse at 50% 70%, #8f4b2e 0 19%, transparent 20%), radial-gradient(ellipse at 38% 57%, #f2d4a9 0 11%, transparent 12%), radial-gradient(ellipse at 65% 42%, #f2d4a9 0 13%, transparent 14%)' }} /> }
               <span className="relative rounded-full bg-[#fffaf3]/85 px-3 py-1 text-xs font-semibold text-[#5b4b41]">
                 {product.sale_method === 'weight' ? 'A peso · prezzo al kg' : `A ${product.unit}`}
               </span>
