@@ -1,4 +1,13 @@
 @import 'tailwindcss';
+
+@media (min-width: 1024px) {
+  .catalogo-products-grid > div:last-child {
+    max-height: 680px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    scrollbar-gutter: stable;
+  }
+}
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
