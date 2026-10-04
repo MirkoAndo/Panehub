@@ -1,13 +1,14 @@
 @import 'tailwindcss';
 
 @media (min-width: 1024px) {
-  .catalogo-products-grid > div:last-child {
+  .catalogo-products-grid>div:last-child {
     max-height: 680px;
     overflow-y: auto;
     padding-right: 0.5rem;
     scrollbar-gutter: stable;
   }
 }
+
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
@@ -32,9 +33,33 @@
   --radius-2xl: 2rem;
 }
 
-:root { color-scheme: light; }
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: #f7f1e8; color: #30251f; font-family: var(--font-body), sans-serif; }
-button, input, select, textarea { font: inherit; }
-::selection { background: #ad4e32; color: #fffaf3; }
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f7f1e8;
+  color: #30251f;
+  font-family: var(--font-body), sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: #ad4e32;
+  color: #fffaf3;
+}
