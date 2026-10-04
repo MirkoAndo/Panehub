@@ -64,7 +64,7 @@ const fallbackCategories: Category[] = [
   { id: 'biscotteria', name: 'Biscotteria', slug: 'biscotteria' },
 ];
 
-export function PanehubStorefront({ products = fallbackProducts, categories = fallbackCategories }: { products?: Product[]; categories?: Category[] }) {
+export function PanehubStorefront({ products = fallbackProducts, categories = fallbackCategories, heroImageUrl = null }: { products?: Product[]; categories?: Category[]; heroImageUrl?: string | null }) {
   const [activeCategory, setActiveCategory] = useState('all')
   const [cart, setCart] = useState<Record<string, number>>({})
   const [showReservation, setShowReservation] = useState(false)
@@ -141,7 +141,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
     <div className="relative overflow-hidden rounded-[2rem] bg-[#c99a70] p-5 sm:p-8">
       <div 
         className="aspect-[.88] overflow-hidden rounded-[1.5rem] bg-[#e5c3a0]" 
-        style={{ backgroundImage: 'radial-gradient(circle at 35% 24%, #f7e4c9 0 7%, transparent 7.5%), radial-gradient(circle at 64% 52%, #b86b43 0 14%, transparent 14.5%), linear-gradient(140deg, #f2d9b9, #b96842 70%, #6e382b)' }}
+        style={heroImageUrl ? { backgroundImage: `url(${heroImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { backgroundImage: 'radial-gradient(circle at 35% 24%, #f7e4c9 0 7%, transparent 7.5%), radial-gradient(circle at 64% 52%, #b86b43 0 14%, transparent 14.5%), linear-gradient(140deg, #f2d9b9, #b96842 70%, #6e382b)' }}
       >
         <div className="flex h-full items-end p-7">
           <div className="max-w-[15rem] rounded-2xl bg-[#30251f]/90 p-5 text-[#fffaf3]">
