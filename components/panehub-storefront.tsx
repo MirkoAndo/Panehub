@@ -72,12 +72,12 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
   const [form, setForm] = useState({ name: '', phone: '', email: '', date: '', slot: '07:00 – 09:00', notes: '' })
   const visible = activeCategory === 'all' ? products : products.filter((product) => product.category_id === activeCategory || product.category_id === categories.find((category) => category.slug === activeCategory)?.id)
   const cartItems = products.filter((product) => cart[product.id]).map((product) => ({ ...product, quantity: cart[product.id] }))
-  const total = useMemo(() => cartItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0), [cartItems])
-  const updateCart = (id: string, delta: number) => setCart((current) => ({ ...current, [id]: Math.max(0, (current[id] ?? 0) + delta) }))
+  const total = useMemo(() => cartItems.reduce((sum, item) => sum + (item.sale_method === 'weight' ? Number(item.price_per_kg ?? item.price) * item.quantity / 1000 : Number(item.price) * item.quantity), 0), [cartItems])
+  const updateCart = (id: string, delta: number) => setCart((current) => { const product = products.find((item) => item.id === id); const step = product?.quantity_step ?? (product?.sale_method === 'weight' ? 100 : 1); return { ...current, [id]: Math.max(0, (current[id] ?? 0) + delta * step) } })
   const submitReservation = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!form.name || !form.phone || !form.date || cartItems.length === 0) return
-    const response = await fetch('/api/reservations', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email || null, date: form.date, slot: form.slot, notes: form.notes || null, items: cartItems.map((item) => ({ productId: item.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? item.id : null, productName: item.name, quantity: item.quantity, unitPrice: Number(item.price) })) }) })
+    const response = await fetch('/api/reservations', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email || null, date: form.date, slot: form.slot, notes: form.notes || null, items: cartItems.map((item) => ({ productId: item.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? item.id : null, productName: item.name, quantity: item.quantity, unitPrice: item.sale_method === 'weight' ? Number(item.price_per_kg ?? item.price) : Number(item.price), saleMethod: item.sale_method ?? 'piece' })) }) })
     const result = await response.json()
     if (!response.ok) { window.alert(result.error ?? 'Impossibile inoltrare la prenotazione.'); return }
     setSubmittedCode(result.code)
@@ -242,7 +242,7 @@ export function PanehubStorefront({ products = fallbackProducts, categories = fa
                 </div>
                 
                 <p className="mt-2 text-[11px] text-[#76675c]">
-                  {product.sale_method === 'weight' ? 'Aggiungi 100 g alla volta · prezzo calcolato al kg' : 'Aggiungi all’ordine'}
+                  {product.sale_method === 'weight' ? `Aggiungi ${product.quantity_step ?? 100} g alla volta · prezzo calcolato al kg` : 'Aggiungi all’ordine'}
                 </p>
               </div> 
 
