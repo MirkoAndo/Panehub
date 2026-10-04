@@ -42,7 +42,7 @@ export function DashboardCategories() {
 
   return <section className="border-t border-border pt-10">
     <div className="flex flex-wrap items-end justify-between gap-4">
-      <div><p className="font-mono text-xs uppercase tracking-[.2em] text-muted-foreground">Catalogo / Struttura</p><h2 className="mt-2 font-serif text-4xl">Categorie.</h2><p className="mt-2 text-muted-foreground">Crea e rinomina le categorie usate nel form prodotto.</p></div>
+      <div><p className="font-mono text-xs uppercase tracking-[.2em] text-muted-foreground">Catalogo / Struttura</p><h2 className="mt-2 font-serif text-4xl">Categorie.</h2><p className="mt-2 text-muted-foreground">Crea, rinomina e riutilizza le categorie archiviate nel form prodotto.</p></div>
       <button type="button" onClick={reset} className="border border-border px-4 py-2 text-sm">Nuova categoria</button>
     </div>
     {error && <p className="mt-4 text-sm text-destructive">{error}</p>}

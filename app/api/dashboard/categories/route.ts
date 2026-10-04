@@ -16,7 +16,14 @@ export async function POST(request: Request) {
   if (!allowed) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
   const body = await request.json(); const name = String(body.name ?? '').trim()
   if (!name || name.length > 80) return NextResponse.json({ error: 'Nome categoria non valido' }, { status: 400 })
-  const { data, error } = await admin.from('categories').insert({ name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), active: true }).select('id,name').single()
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const { data: archived } = await admin.from('categories').select('id,name').eq('slug', slug).eq('active', false).maybeSingle()
+  if (archived) {
+    const { data, error } = await admin.from('categories').update({ name, active: true }).eq('id', archived.id).select('id,name').single()
+    if (error) return NextResponse.json({ error: 'Impossibile riattivare la categoria' }, { status: 400 })
+    return NextResponse.json(data)
+  }
+  const { data, error } = await admin.from('categories').insert({ name, slug, active: true }).select('id,name').single()
   if (error) return NextResponse.json({ error: 'Categoria già esistente o dati non validi' }, { status: 400 })
   return NextResponse.json(data)
 }
