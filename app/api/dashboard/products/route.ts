@@ -13,7 +13,7 @@ async function authorize(request: Request) {
 export async function GET(request: Request) {
   const { admin, allowed } = await authorize(request)
   if (!allowed) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  const { data, error } = await admin.from('products').select('id,name,description,price,unit,sale_method,price_per_kg,image_url,available,active,category_id,categories(name)').order('created_at')
+  const { data, error } = await admin.from('products').select('id,name,description,price,unit,sale_method,quantity_step,price_per_kg,image_url,available,active,category_id,categories(name)').order('created_at')
   if (error) return NextResponse.json({ error: 'Impossibile caricare il catalogo' }, { status: 500 })
   return NextResponse.json(data ?? [])
 }
@@ -22,9 +22,9 @@ export async function POST(request: Request) {
   const { admin, allowed } = await authorize(request)
   if (!allowed) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
   const body = await request.json()
-  const payload = { name: String(body.name ?? '').trim(), description: String(body.description ?? '').trim(), price: Number(body.price), unit: String(body.unit ?? 'pezzo').trim(), sale_method: ['piece', 'weight', 'both'].includes(body.sale_method) ? body.sale_method : 'piece', price_per_kg: body.price_per_kg === '' || body.price_per_kg == null ? null : Number(body.price_per_kg), image_url: body.image_url ? String(body.image_url).trim() : null, category_id: body.category_id || null, available: body.available !== false, active: body.active !== false }
+  const payload = { name: String(body.name ?? '').trim(), description: String(body.description ?? '').trim(), price: Number(body.price), unit: String(body.unit ?? 'pezzo').trim(), quantity_step: Math.max(1, Math.floor(Number(body.quantity_step) || 1)), sale_method: ['piece', 'weight', 'both'].includes(body.sale_method) ? body.sale_method : 'piece', price_per_kg: body.price_per_kg === '' || body.price_per_kg == null ? null : Number(body.price_per_kg), image_url: body.image_url ? String(body.image_url).trim() : null, category_id: body.category_id || null, available: body.available !== false, active: body.active !== false }
   if (!payload.name || !Number.isFinite(payload.price) || payload.price < 0) return NextResponse.json({ error: 'Nome e prezzo sono obbligatori' }, { status: 400 })
-  const { data, error } = await admin.from('products').insert(payload).select('id,name,description,price,unit,sale_method,price_per_kg,image_url,available,active,category_id').single()
+  const { data, error } = await admin.from('products').insert(payload).select('id,name,description,price,unit,sale_method,quantity_step,price_per_kg,image_url,available,active,category_id').single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data, { status: 201 })
 }
@@ -33,9 +33,9 @@ export async function PATCH(request: Request) {
   const { admin, allowed } = await authorize(request)
   if (!allowed) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
   const body = await request.json(); const id = String(body.id ?? '')
-  const payload = { name: String(body.name ?? '').trim(), description: String(body.description ?? '').trim(), price: Number(body.price), unit: String(body.unit ?? 'pezzo').trim(), sale_method: ['piece', 'weight', 'both'].includes(body.sale_method) ? body.sale_method : 'piece', price_per_kg: body.price_per_kg === '' || body.price_per_kg == null ? null : Number(body.price_per_kg), image_url: body.image_url ? String(body.image_url).trim() : null, category_id: body.category_id || null, available: body.available !== false, active: body.active !== false }
+  const payload = { name: String(body.name ?? '').trim(), description: String(body.description ?? '').trim(), price: Number(body.price), unit: String(body.unit ?? 'pezzo').trim(), quantity_step: Math.max(1, Math.floor(Number(body.quantity_step) || 1)), sale_method: ['piece', 'weight', 'both'].includes(body.sale_method) ? body.sale_method : 'piece', price_per_kg: body.price_per_kg === '' || body.price_per_kg == null ? null : Number(body.price_per_kg), image_url: body.image_url ? String(body.image_url).trim() : null, category_id: body.category_id || null, available: body.available !== false, active: body.active !== false }
   if (!id || !payload.name || !Number.isFinite(payload.price) || payload.price < 0) return NextResponse.json({ error: 'Dati prodotto non validi' }, { status: 400 })
-  const { data, error } = await admin.from('products').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', id).select('id,name,description,price,unit,sale_method,price_per_kg,image_url,available,active,category_id').single()
+  const { data, error } = await admin.from('products').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', id).select('id,name,description,price,unit,sale_method,quantity_step,price_per_kg,image_url,available,active,category_id').single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
